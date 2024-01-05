@@ -127,7 +127,7 @@ class hpipm_ocp_qp_solver(hpipm_solver):
 			else:
 				n_col[0] = 1
 
-			var.append(np.zeros((n_row[0], n_col[0]), dtype=np.float))
+			var.append(np.zeros((n_row[0], n_col[0])))
 			tmp_ptr = cast(var[-1].ctypes.data, POINTER(c_double))
 			getter['var'](qp.qp_struct, self.arg.arg_struct, self.ipm_ws_struct, i, tmp_ptr)
 
