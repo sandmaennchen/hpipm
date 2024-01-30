@@ -90,8 +90,8 @@ class hpipm_ocp_qp_solver(hpipm_solver):
 				'var': __hpipm.d_ocp_qp_ipm_get_ric_p
 			},
 			'ric_K': {
-				'n_row': __hpipm.d_ocp_qp_dim_get_nu,
-				'n_col': __hpipm.d_ocp_qp_dim_get_nx,
+				'n_row': __hpipm.d_ocp_qp_dim_get_nx,
+				'n_col': __hpipm.d_ocp_qp_dim_get_nu,
 				'var': __hpipm.d_ocp_qp_ipm_get_ric_K
 			},
 			'ric_k': {
@@ -133,9 +133,15 @@ class hpipm_ocp_qp_solver(hpipm_solver):
 			else:
 				n_col[0] = 1
 
-			var.append(np.zeros((n_row[0], n_col[0])))
-			tmp_ptr = cast(var[-1].ctypes.data, POINTER(c_double))
+			var_tmp = np.zeros((n_row[0], n_col[0]))
+			# tmp_ptr = cast(var[-1].ctypes.data, POINTER(c_double))
+			tmp_ptr = cast(var_tmp.ctypes.data, POINTER(c_double))
 			getter['var'](qp.qp_struct, self.arg.arg_struct, self.ipm_ws_struct, i, tmp_ptr)
+
+			if not 'n_col' in getter:
+				var.append(var_tmp)
+			else: 
+				var.append(var_tmp.T) # Needs to be transposed such that the correct gain K is returned
 
 		return var if idx_end is not None else var[0]
 
